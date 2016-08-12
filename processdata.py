@@ -35,7 +35,7 @@ def processPaperTypeInfo(printer, paper_type_info):
     paper_types = []
     for tray in paper_type_info:
         tray = str(tray)
-        if tray[:3] == 'na-':
+        if tray[:3] == 'na-' or tray[:3] == 'na_':
             paper_types.append(tray[3:].capitalize())
         elif tray[:3] == 'iso':
             paper_types.append(tray.upper())
@@ -89,7 +89,7 @@ def setDisabledDisplay(printer, status_info):
     printer.setStatus('Disabled')
     error_oid = status_info[1][:22] + '8' + status_info[1][23:]
     message_info = error_message(printer.getIP(),error_oid)
-    printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
+    #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
     return message_info
   
 # Calls above methods to get displays to represent the data  
@@ -125,7 +125,7 @@ def queryPrinter(printer):
         or status_info[0] == 'error':
         
         printer.setStatus('Not Responding')
-        printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
+        #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
         
     else:
         setDisplays(printer, toner_info, paper_type_info, paper_level_info, status_info)
@@ -138,7 +138,7 @@ def queryAll():
                 queryPrinter(printer)
             except pysnmp.error.PySnmpError:
                 printer.setStatus('Not Responding')
-                printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
+                #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
             
             
         
