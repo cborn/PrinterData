@@ -11,6 +11,32 @@ import pysnmp
 
 # Runs through OIDs starting at 1.3.6.1.2.1.43.8.2.1.10.1.1 until reaches non-paper-level OID
 # Returns list of paper level values, order corresponds to tray order
+def paper_max(IP):
+    trays = []
+    for errorIndication, \
+        errorStatus, errorIndex, \
+        varBinds in nextCmd(SnmpEngine(),
+                            CommunityData('public', mpModel=0),
+                            UdpTransportTarget((IP, 161)),
+                            ContextData(),
+                            ObjectType(ObjectIdentity('1.3.6.1.2.1.43.8.2.1.9.0'))):
+        if errorIndication:
+            return ['error',errorIndication.__str__()]
+        elif errorStatus:
+            return ['error','%s at %s' % (
+                    errorStatus.prettyPrint(),
+                    errorIndex and varBinds[int(errorIndex)-1][0] or '?'
+                )]
+        else:
+            for varBind in varBinds:
+                oid = varBind[0]
+                val = varBind[1]
+                if tuple(oid)[-3] != 9:
+                    return trays
+                trays.append(val)
+
+# Runs through OIDs starting at 1.3.6.1.2.1.43.8.2.1.10.1.1 until reaches non-paper-level OID
+# Returns list of paper level values, order corresponds to tray order
 def paper_level(IP):
     trays = []
     for errorIndication, \

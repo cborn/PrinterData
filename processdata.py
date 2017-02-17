@@ -3,7 +3,7 @@ processdata.py  Kiya Govek  2015 Jan
 processes snmp information from snmpquery.py
 gives information to tableview.py
 """
-
+from __future__ import division
 from snmpquery import *
 
 # Determine how to display the level information for each toner
@@ -45,25 +45,31 @@ def processPaperTypeInfo(printer, paper_type_info):
     
 # Convert codes used by printers to corresponding display icons
 # No return, set paper level variable of printer object to list of html icon strings
-def processPaperLevelInfo(printer, paper_level_info):
+def processPaperLevelInfo(printer, paper_max_info, paper_level_info):
     paper_levels = []
-    for tray in paper_level_info:
-        # Tray is full
-        if tray == -3 or tray == 500 or tray == 550:
-            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i>')
-        # Tray is at half value
-        elif tray == 275:
-            paper_levels.append('<i class="material-icons half" style="font-size:12px">brightness_2</i>')
-        # Tray is low
-        elif tray == 50 or tray == 55:
-            paper_levels.append('<i class="material-icons low" style="font-size:12px">brightness_3</i>')
-        # Tray is empty
-        elif tray == 0:
-            paper_levels.append('<i class="material-icons empty" style="font-size:12px">panorama_fish_eye</i>')
-        # Tray can't read paper level, probably not closed properly
-        elif tray == -2:
+    for index in range(0, len(paper_level_info)):
+        tray = float(paper_level_info[index])
+        max = float(paper_max_info[index])
+        fraction = tray/max
+        # tray is not closed properly, or levels unknown
+        if tray == -2:
             paper_levels.append('<span style="font-size:20px" class="unknown">? </span>')
-        # Haven't encountered this number before
+        # full
+        elif tray == -3:
+            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i>')
+        # full
+        elif fraction > 0.99:
+            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i>')
+        # half
+        elif fraction <= 0.99 and fraction > 0.3:
+            paper_levels.append('<i class="material-icons half" style="font-size:12px">brightness_2</i>')
+        # low
+        elif fraction <= 0.3 and fraction > 0:
+            paper_levels.append('<i class="material-icons low" style="font-size:12px">brightness_3</i>')
+        # empty
+        elif fraction == 0:
+            paper_levels.append('<i class="material-icons empty" style="font-size:12px">panorama_fish_eye</i>')
+        # some other value
         else:
             paper_levels.append('<span class="unknown"> ??? </span>')
     printer.setPaperLevels(paper_levels)
@@ -93,14 +99,14 @@ def setDisabledDisplay(printer, status_info):
     return message_info
   
 # Calls above methods to get displays to represent the data  
-def setDisplays(printer, toner_info, paper_type_info, paper_level_info, status_info):
+def setDisplays(printer, toner_info, paper_type_info, paper_max_info, paper_level_info, status_info):
         printer.setStatusIcon('')
         
         processTonerInfo(printer, toner_info)
         
         processPaperTypeInfo(printer, paper_type_info)
         
-        processPaperLevelInfo(printer, paper_level_info)
+        processPaperLevelInfo(printer, paper_max_info, paper_level_info)
         
         printer.setStatus(status_info[0])
         
@@ -114,21 +120,22 @@ def setDisplays(printer, toner_info, paper_type_info, paper_level_info, status_i
     
 # Calls methods from snmpquery to get printer data, checks that data has arrived successfully
 def queryPrinter(printer):
+    paper_max_info = paper_max(printer.getIP())
     paper_type_info = paper_type(printer.getIP())
     paper_level_info = paper_level(printer.getIP())
     toner_info = toner_level(printer.getIP())
     status_info = status(printer.getIP())
     
-    if paper_type_info[0] == 'error' \
+    if paper_max_info[0] == 'error' \
+        or paper_type_info[0] == 'error' \
         or paper_level_info[0] == 'error' \
         or toner_info[0] == 'error' \
         or status_info[0] == 'error':
         
         printer.setStatus('Not Responding')
-        #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
         
     else:
-        setDisplays(printer, toner_info, paper_type_info, paper_level_info, status_info)
+        setDisplays(printer, toner_info, paper_type_info, paper_max_info, paper_level_info, status_info)
     
 
 def queryAll():  
