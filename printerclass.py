@@ -4,6 +4,7 @@ creates and fills informational classes for individual printers and models
 printerModel has basic information needed for snmp request
 printerData will be filled by information from snmp query
 """
+import csv
 
 # Model class with tray number and toner name info for each model of printer
 class printerModel():
@@ -108,36 +109,38 @@ class printerData():
         self.message = message
         
         
-# create model objects    
-x4600 = printerModel('x4600',3,2)
-x4600.setTonerAll(['Toner Cartridge','Drum Cartridge'])
-x5550 = printerModel('x5550',5,3)
-x5550.setTonerAll(['Toner Cartridge','Drum Cartridge','Maintenance Kit'])
-x6360 = printerModel('x6360',3,7)
-x6360.setTonerAll(['Cyan','Magenta','Yellow','Black','Imaging Unit','Fuser','Transfer Roller'])
-cc5051 = printerModel('cc5051',5,5)
-cc5051.setTonerAll(['Black','Cyan','Magenta','Yellow','Waste'])
-cc5051.setGivesTypeInfo(False)
+modelsDict= {}
+modelOrderToDisplay = [] # for ordering purposes
+csv_file = open("printermodels.csv", 'r')
+csv_reader = csv.reader(csv_file, delimiter=',')
+for row in csv_reader:
+    name = row[0]
+    tray_num = int(row[1])
+    toner_num = int(row[2])
+    toners = row[3:3+toner_num]
+    gives_types = row[3+toner_num]
+    model = printerModel(name,tray_num,toner_num)
+    model.setTonerAll(toners)
+    if gives_types == 'n' or gives_types == 'N':
+        model.setGivesTypeInfo(False)
+    modelsDict[name] = model
+    modelOrderToDisplay.append(name)
 
-# create dictionary to hold which printers go with which models
-modelToPrinter = {x4600:[], x5550:[], x6360:[], cc5051:[]}
-# ordered list since dictionaries aren't ordered, to show how the tables should be arranged
-modelOrderToDisplay = [x4600, x5550, x6360, cc5051]
+csv_file.close()
 
-# create printer objects to add to dictionary of printers
-modelToPrinter[x4600].append(printerData('cass101','137.22.12.47',x4600))
-modelToPrinter[x4600].append(printerData('mudd169','137.22.12.48',x4600))
-modelToPrinter[x4600].append(printerData('will119','137.22.12.49',x4600))
-modelToPrinter[x5550].append(printerData('ghue156','137.22.12.34',x5550))
-modelToPrinter[x5550].append(printerData('ldc243','137.22.12.44',x5550))
-modelToPrinter[x5550].append(printerData('libr451b','137.22.12.36',x5550))
-modelToPrinter[x5550].append(printerData('libr451c','137.22.12.37',x5550))
-modelToPrinter[x5550].append(printerData('libr451d','137.22.12.38',x5550))
-modelToPrinter[x5550].append(printerData('libr451e','137.22.12.33',x5550))
-modelToPrinter[x5550].append(printerData('sayl218a','137.22.12.55',x5550))
-modelToPrinter[x5550].append(printerData('sayl218b','137.22.12.56',x5550))
-modelToPrinter[x6360].append(printerData('wcc138','137.22.12.43',x6360))
-modelToPrinter[cc5051].append(printerData('cmc104','137.22.12.40',cc5051))
-modelToPrinter[cc5051].append(printerData('ldc220','137.22.12.39',cc5051))
-modelToPrinter[cc5051].append(printerData('libr400','137.22.12.62',cc5051))
-modelToPrinter[cc5051].append(printerData('wcc020','137.22.12.41',cc5051))
+modelToPrinter = {}
+
+csv_file = open("printers.csv", 'r')
+csv_reader = csv.reader(csv_file, delimiter=',')
+for row in csv_reader:
+    name = row[0]
+    ip_address = row[1]
+    model = row[2]
+    if model in modelsDict:
+        if model not in modelToPrinter:
+            modelToPrinter[model] = []
+        i = 0
+        while i < len(modelToPrinter[model]) and modelToPrinter[model][i].getName() < name:
+            i += 1
+        modelToPrinter[model].insert(i,printerData(name,ip_address,modelsDict[model]))
+
