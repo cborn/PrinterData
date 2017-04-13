@@ -22,7 +22,7 @@ def processTonerInfo(printer, toner_info):
             toner_levels.append('<span class="ready"> OK </span>')
         else:
             toner_percentage = int(round(toner_actual/toner_max * 100))
-            if toner_percentage > 5:
+            if toner_percentage > 10:
                 toner_levels.append('<i class="material-icons" style="font-size:12px">brightness_1</i> '+str(toner_percentage)+'%')
             # Toner is low, use different icon and color
             else:
@@ -41,6 +41,12 @@ def processPaperTypeInfo(printer, paper_type_info):
             paper_types.append(tray.upper())
         else:
             paper_types.append(tray.capitalize())
+    if len(paper_types) > printer.model.getTrayNum():
+        message = printer.getMessage() + " Extra trays:"
+        for extra_type in paper_types[printer.model.getTrayNum():]:
+            message = message+" "+extra_type
+        printer.setMessage(message)
+        paper_types = paper_types[:printer.model.getTrayNum()]
     printer.setPaperTypes(paper_types)
     
 # Convert codes used by printers to corresponding display icons
@@ -72,6 +78,8 @@ def processPaperLevelInfo(printer, paper_max_info, paper_level_info):
         # some other value
         else:
             paper_levels.append('<span class="unknown"> ??? </span>')
+    if len(paper_levels)>printer.model.getTrayNum():
+        paper_levels = paper_levels[:printer.model.getTrayNum()]
     printer.setPaperLevels(paper_levels)
 
 # Checks for confusing messages such as hexadecimal 
@@ -82,12 +90,15 @@ def messageFormatting(message):
         new_message = message
     if new_message == ' mudd169-x4600.prin..':
         new_message = 'Printing'
+    if new_message == 'Power Saver Mode active - Press OK button to return to Ready.':
+        new_message = 'Power Save'
     return new_message
 
 # Converts a hexadecimal message to English          
 def hexToEnglish(message):
     message_hex = message[2:].replace('a0','20')
-    new_message = message_hex.decode("hex")
+    #new_message = message_hex.decode("hex") # python 2.7
+    new_message = bytes.fromhex(message_hex).decode('utf-8') # python 3.5
     return new_message
   
 # Printer is disabled, so query printer for error reason and return reason          
@@ -100,6 +111,14 @@ def setDisabledDisplay(printer, status_info):
   
 # Calls above methods to get displays to represent the data  
 def setDisplays(printer, toner_info, paper_type_info, paper_max_info, paper_level_info, status_info):
+        if status_info[0] == 'Printing is disabled':
+            message_info = setDisabledDisplay(printer, status_info)
+        else:
+            message_info = screen_message(printer.getIP())
+        if message_info[0] == 'success':
+            message = messageFormatting(message_info[1])
+            printer.setMessage(message)
+            
         printer.setStatusIcon('')
         
         processTonerInfo(printer, toner_info)
@@ -109,14 +128,6 @@ def setDisplays(printer, toner_info, paper_type_info, paper_max_info, paper_leve
         processPaperLevelInfo(printer, paper_max_info, paper_level_info)
         
         printer.setStatus(status_info[0])
-        
-        if status_info[0] == 'Printing is disabled':
-            message_info = setDisabledDisplay(printer, status_info)
-        else:
-            message_info = screen_message(printer.getIP())
-        if message_info[0] == 'success':
-            message = messageFormatting(message_info[1])
-            printer.setMessage(message)
     
 # Calls methods from snmpquery to get printer data, checks that data has arrived successfully
 def queryPrinter(printer):
