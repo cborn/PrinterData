@@ -1,0 +1,47 @@
+{% extends "advancedsearch.html" %}
+
+{% block left %}
+{% endblock %}
+
+{% block top %}
+    <div id="navsearch">
+        <form id="search" method="post" action="/popularity">
+            <input type="text" name="query" placeholder="Search Books...">
+            <input type="submit" value="GO">
+        </form>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div style="width:1000px">
+    <h1>Short Description of Project</h1>
+    <p>Currently the site has 3 pages: a homepage, an advanced search page, and a search results page.
+    The homepage allows the user to search for anything. Anything in the database that matches the query is
+    returned in order of popularity (aka number of downloads). This same search principle is applied to the
+    small search bar in the upper right corner of the two other pages. The advanced search page is reachable
+    from the search results page and the homepage. It allows the user to specify which section they would like
+    to search in (author, title, or genre). The Project Gutenberg logo persists through all pages and is click-able.</p>
+    <h1>List of Features</h1>
+    <ul>
+        <li>Search for anything and get results back sorted by popularity.</li>
+        <li>Narrow down the search by querying specific categories.</li>
+        <li>Displays helpful information about free eBooks.</li>
+        <li>Link directly to the actual eBooks.</li>
+    </ul>
+    <h1>Data Set Citation</h1>
+    <ul>
+        <li>Name: "The Complete Project Gutenberg Catalog"</li>
+        <li>Organization: Project Gutenberg</li>
+        <li><a href="http://www.gutenberg.org/wiki/Gutenberg:Offline_Catalogs">Link to the data set</a></li>
+        <li><a href="http://www.gutenberg.org/wiki/Gutenberg:Feeds">Licensing information</a></li>
+    </ul>
+    <h1>The One Thing We Wish We Had Time to Implement</h1>
+    <p>We really wanted to dynamically scrape images of the books to include in our search results, but the
+    project gutenberg site doesn't allow it. They block IP addresses that try to scrape their site.</p>
+    <h1>Database Scripts</h1>
+    <p><a href="{{ url_for('static', filename="XMLparser.py") }}">Script used to parse our XML data files into a CSV file</a></p>
+    <p><a href="{{ url_for('static', filename="data.csv") }}">Here's that CSV file</a></p>
+    <p><a href="{{ url_for('static', filename="createtable.sql") }}">The sql file used to create the table</a></p>
+    <h1>NOTE: This project is located in Julia Connelly's thacker (connellyj)</h1>
+    </div>
+{% endblock %}

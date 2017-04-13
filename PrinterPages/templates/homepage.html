@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Printer Pages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename="main.css") }}">
+    {% block links %}
+    {% endblock %}
+</head>
+<body>
+<div id="wrapper">
+    <div id="content">
+    <div id="absolute">
+        {% block content %}
+        <div id="searchbar">
+            <h1>Welcome to Printer Pages!</h1>
+            <a href="/printers">Start Printer Pages</a>
+        </div>
+        {% endblock %}
+    </div>
+    </div>
+</div>
+</body>
+</html>
