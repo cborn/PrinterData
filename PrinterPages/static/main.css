@@ -1,0 +1,54 @@
+#wrapper{
+    position: fixed;
+    overflow-y: scroll;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+#content{
+    top: 155px;
+    left: 256px;
+    position: relative;
+}
+#logo{
+    text-align: center;
+    float: left;
+}
+#logo h2{
+   margin: 0;
+}
+#logo img{
+    width: 256px;
+    height: 125px;
+}
+#searchbar{
+    text-align: center;
+    line-height: 20px;
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#searchbar input[type = "text"]{
+    font-size: 20px;
+    width: 400px;
+    height: 30px;
+}
+#searchbar input[type = "submit"]{
+    font-size: 20px;
+    border: none;
+    height: 36px;
+}
+#searchbar a{
+    padding-top: 5px;
+}
+#searchbar h1{
+    margin: 40px;
+}
+#leftcolumn{
+    float: left;
+}
+#absolute{
+    position: absolute;
+}

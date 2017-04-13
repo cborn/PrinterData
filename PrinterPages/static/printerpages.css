@@ -1,0 +1,14 @@
+
+td{
+    padding: 5px;
+}
+.printerdata{
+    font-weight: bold;
+    font-size: 16px;
+}
+.errors{
+    font-size: 14px;
+}
+#printers{
+    width: 1000px;
+}
