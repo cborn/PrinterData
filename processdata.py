@@ -17,7 +17,7 @@ def processTonerInfo(printer, toner_info):
         # Second half of toner_info is actual value for each toner
         toner_actual = float(toner_info[toner_index+model.getTonerNum()])
         if toner_actual == -2:
-            toner_levels.append('<span class="unknown"> Unknown </span>')
+            toner_levels.append('<span class="unknown"> ? </span>')
         elif toner_actual == -3:
             toner_levels.append('<span class="ready"> OK </span>')
         else:
@@ -35,7 +35,9 @@ def processPaperTypeInfo(printer, paper_type_info):
     paper_types = []
     for tray in paper_type_info:
         tray = str(tray)
-        if tray[:3] == 'na-' or tray[:3] == 'na_':
+        if tray == 'Unknown':
+            paper_types.append('?')
+        elif tray[:3] == 'na-' or tray[:3] == 'na_':
             paper_types.append(tray[3:].capitalize())
         elif tray[:3] == 'iso':
             paper_types.append(tray.upper())
