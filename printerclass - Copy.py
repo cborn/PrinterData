@@ -104,7 +104,7 @@ class printerData():
         
 modelsDict= {}
 modelOrder = [] # for ordering purposes
-csv_file = open("C:\\Program Files\\PrinterData\\printermodels.csv", 'r')
+csv_file = open("C:\\Users\\govekk\\Documents\\PrinterData\\printermodels.csv", 'r')
 csv_reader = csv.reader(csv_file, delimiter=',')
 for row in csv_reader:
     if len(row) > 0:
@@ -129,7 +129,7 @@ csv_file.close()
 
 modelToPrinter = {}
 
-csv_file = open("C:\\Program Files\\PrinterData\\printers.csv", 'r')
+csv_file = open("C:\\Users\\govekk\\Documents\\PrinterData\\printers.csv", 'r')
 csv_reader = csv.reader(csv_file, delimiter=',')
 for row in csv_reader:
     if len(row) > 0:

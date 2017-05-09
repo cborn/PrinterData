@@ -61,22 +61,22 @@ def processPaperLevelInfo(printer, paper_max_info, paper_level_info):
         fraction = tray/max
         # tray is not closed properly, or levels unknown
         if tray == -2:
-            paper_levels.append('<span style="font-size:20px" class="unknown">? </span>')
+            paper_levels.append('<span style="font-size:20px" class="unknown">? </span> ')
         # full
         elif tray == -3:
-            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i>')
+            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i> ')
         # full
         elif fraction > 0.99:
-            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i>')
+            paper_levels.append('<i class="material-icons ready" style="font-size:12px">brightness_1</i> ')
         # half
         elif fraction <= 0.99 and fraction > 0.3:
-            paper_levels.append('<i class="material-icons half" style="font-size:12px">brightness_2</i>')
+            paper_levels.append('<i class="material-icons half" style="font-size:12px">brightness_2</i> ')
         # low
         elif fraction <= 0.3 and fraction > 0:
-            paper_levels.append('<i class="material-icons low" style="font-size:12px">brightness_3</i>')
+            paper_levels.append('<i class="material-icons low" style="font-size:12px">brightness_3</i> ')
         # empty
         elif fraction == 0:
-            paper_levels.append('<i class="material-icons empty" style="font-size:12px">panorama_fish_eye</i>')
+            paper_levels.append('<i class="material-icons empty" style="font-size:12px">panorama_fish_eye</i> ')
         # some other value
         else:
             paper_levels.append('<span class="unknown"> ??? </span>')
@@ -149,16 +149,26 @@ def queryPrinter(printer):
         
     else:
         setDisplays(printer, toner_info, paper_type_info, paper_max_info, paper_level_info, status_info)
+
+def queryModel(model):
+    for printer in modelToPrinter[model]:
+        try:
+            queryPrinter(printer)
+        except pysnmp.error.PySnmpError:
+            printer.setStatus('Not Responding')
+            #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
     
 
 def queryAll():  
     for model in modelToPrinter:
-        for printer in modelToPrinter[model]:
+        queryModel(model)
+        
+        """for printer in modelToPrinter[model]:
             try:
                 queryPrinter(printer)
             except pysnmp.error.PySnmpError:
                 printer.setStatus('Not Responding')
-                #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')
+                #printer.setStatusIcon('<i class="material-icons" style="font-size:20px">error_outline</i>')"""
             
             
         
