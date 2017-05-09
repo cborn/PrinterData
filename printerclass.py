@@ -107,15 +107,16 @@ modelOrder = [] # for ordering purposes
 csv_file = open("C:\\Program Files\\PrinterData\\printermodels.csv", 'r')
 csv_reader = csv.reader(csv_file, delimiter=',')
 for row in csv_reader:
-    if len(row) > 0:
+    if len(row) > 2:
         name = row[0]
         tray_num = int(row[1])
         toner_num = int(row[2])
-        toners = row[3:3+toner_num]
-        model = printerModel(name,tray_num,toner_num)
-        model.setTonerAll(toners)
-        modelsDict[name] = model
-        modelOrder.append(name)
+        if len(row) > 2+toner_num: # only read row if it has all information
+            toners = row[3:3+toner_num]
+            model = printerModel(name,tray_num,toner_num)
+            model.setTonerAll(toners)
+            modelsDict[name] = model
+            modelOrder.append(name)
     
 # create dictionary of next model to go to
 modelOrderToDisplay = {}
@@ -132,7 +133,7 @@ modelToPrinter = {}
 csv_file = open("C:\\Program Files\\PrinterData\\printers.csv", 'r')
 csv_reader = csv.reader(csv_file, delimiter=',')
 for row in csv_reader:
-    if len(row) > 0:
+    if len(row) > 2:
         name = row[0]
         ip_address = row[1]
         model = row[2]
